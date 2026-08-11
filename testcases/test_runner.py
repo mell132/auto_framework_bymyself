@@ -12,6 +12,7 @@ class TestRunner:
 
     @pytest.mark.parametrize("case",data)
     def test_case(self,case):
+        all=self.all
         #解析请求数据
         method = case["method"]
         url = "http://192.168.10.131:8888/api/private/v1"+case["path"]
@@ -57,3 +58,10 @@ class TestRunner:
             conn.close()
             assert result[0]==case["sql_expected"]
         #提取
+        #json提取
+        if case["jsonExData"]:
+            for key,value in eval(case["jsonExData"]).items():
+                value1=jsonpath.jsonpath(res.json(),value)[0]
+                all[key]=value1
+                print(all)
+
