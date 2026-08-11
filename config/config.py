@@ -9,3 +9,6 @@ DB_PORT=3306
 DB_NAME="mydb"
 DB_USER="root"
 DB_PASSWORD="123456"
+#sql资源销毁
+SQL1='delete from sp_categoty where cat_name="大码服装"'
+SQL2='delete from sp_categoty where attr_name="VIP尺码"'
