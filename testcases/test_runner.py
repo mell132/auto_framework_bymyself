@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from jinja2 import Template
 
@@ -22,8 +24,12 @@ class TestRunner:
         all=self.all
         #引用全局变量，根据all的值渲染case
         case=eval(Template(str(case)).render(all))
+
         #初始化allure报告
         allure_init(case)
+
+        #测试用例的描述信息
+        logging.info(f"用例ID:{case["id"]} 模块：{case["feature"]} 场景：{case["story"]} 标题：{case["title"]}")
         #解析请求数据
         requests_data=analyse_case(case)
         #发送请求，获得响应结果

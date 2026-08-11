@@ -1,0 +1,4 @@
+INFO     root:test_runner.py:32 用例ID:3 模块：用户管理 场景：查询成功 标题：查询用户数据列表成功
+INFO     root:analyse_case.py:28 1.解析请求数据，解析后的请求结果为：{'method': 'get', 'url': 'http://192.168.10.131:8888/api/private/v1/users', 'headers': {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUwMCwicmlkIjowLCJpYXQiOjE3ODY0NjAxMDksImV4cCI6MTc4NjU0NjUwOX0.tUlAT8xTHTtLph1jExU1i6b0c5LPuRQSxaNDZ2M-tqU'}, 'params': {'pagenum': 1, 'pagesize': 1}, 'data': None, 'json': None, 'files': None}
+INFO     root:send_request.py:13 2.发送http请求，响应：{"data":{"total":4,"pagenum":1,"users":[{"id":500,"role_name":"超级管理员","username":"admin","create_time":1486720211,"mobile":"12345678","email":"adsfad@qq.com","mg_state":true}]},"meta":{"msg":"获取管理员列表成功","status":200}}
+INFO     root:asserts.py:12 3.http响应断言内容是：实际结果 (获取管理员列表成功)==预期结果(获取管理员列表成功)
