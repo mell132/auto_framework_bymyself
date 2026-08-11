@@ -1,11 +1,13 @@
 import openpyxl
 
-def read_excel():
+from config.config import *
+
+def read_excel(file_path=EXCEL_FILE,sheet_name=SHEET_NAME):
     #打开excel文件
-    workbook=openpyxl.load_workbook("./data/测试用例.xlsx")
+    workbook=openpyxl.load_workbook(file_path)
 
     #选择表
-    worksheet=workbook["Sheet1"]
+    worksheet=workbook[sheet_name]
     #读数操作
     data=[]
     keys=[cell.value for cell in worksheet[2]]

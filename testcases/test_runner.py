@@ -1,12 +1,15 @@
 import pytest
-import requests
-import jsonpath
-import pymysql
-import allure
 from jinja2 import Template
-from openpyxl.styles.builtins import title
 
+
+from utils import analyse_case, send_request
+from utils.allure_utils import allure_init
+from utils.asserts import http_assert, jdbc_assert
 from utils.excel_utils import read_excel
+from utils.analyse_case import analyse_case
+from utils.extractor import json_extractor, jdbc_extractor
+from utils.send_request import send_http_request, send_jdbc_request
+
 
 class TestRunner:
     #读取测试用例文件中的全部数据，用属性保存
@@ -20,78 +23,20 @@ class TestRunner:
         #引用全局变量，根据all的值渲染case
         case=eval(Template(str(case)).render(all))
         #初始化allure报告
-        allure.dynamic.feature(case["feature"])
-        allure.dynamic.story(case["story"])
-        allure.dynamic.title(f"ID:{case["id"]} --------{case["title"]}")
+        allure_init(case)
         #解析请求数据
-        method = case["method"]
-        url = "http://192.168.10.131:8888/api/private/v1"+case["path"]
-        headers=eval(case["headers"]) if isinstance(case["headers"],str) else None
-        params=eval(case["params"]) if isinstance(case["params"],str) else None
-        data=eval(case["data"]) if isinstance(case["data"],str) else None
-        json=eval(case["json"]) if isinstance(case["json"],str) else None
-        files=eval(case["files"]) if isinstance(case["files"],str) else None
-
-        requests_data={
-            "method":method,
-            "url":url,
-            "headers":headers,
-            "params":params,
-            "data":data,
-            "json":json,
-            "files":files,
-        }
+        requests_data=analyse_case(case)
         #发送请求，获得响应结果
-        res=requests.request(**requests_data)
+        res= send_http_request(**requests_data)
         #处理断言
         #http断言
-        if case["check"]:
-            assert jsonpath.jsonpath(res.json(),case["check"])[0]==case["expected"]
-        else:
-            assert case["expected"] in res.text
+        http_assert(case, res)
 
         #数据库断言
-        if case["sql_check"] and case["sql_expected"]:
-            conn=pymysql.Connect(
-                host="192.168.10.131",
-                port=3306,
-                database="mydb",
-                user="root",
-                password="123456",
-                charset="utf8"
-            )
-            cur=conn.cursor()
-            #执行语句
-            cur.execute(case["sql_check"])
-            result=cur.fetchone()
-            cur.close()
-            conn.close()
-            assert result[0]==case["sql_expected"]
+        jdbc_assert(case)
         #提取
         #json提取
-        if case["jsonExData"]:
-            for key,value in eval(case["jsonExData"]).items():
-                value=jsonpath.jsonpath(res.json(),value)[0]
-                all[key]=value
-                #print(all)
+        json_extractor(case,all,res)
 
         #数据库提取
-        if case["sqlExData"]:
-            for key,value in eval(case["sqlExData"]).items():
-                conn = pymysql.Connect(
-                    host="192.168.10.131",
-                    port=3306,
-                    database="mydb",
-                    user="root",
-                    password="123456",
-                    charset="utf8"
-                )
-                cur = conn.cursor()
-                # 执行语句
-                cur.execute(value)
-                result = cur.fetchone()
-                cur.close()
-                conn.close()
-                value=result[0]
-                all[key] = value
-                #print(all)
+        jdbc_extractor(case,all)
