@@ -1,6 +1,7 @@
 import pytest
 import requests
 import jsonpath
+import pymysql
 from utils.excel_utils import read_excel
 
 class TestRunner:
@@ -32,9 +33,27 @@ class TestRunner:
         #发送请求，获得响应结果
         res=requests.request(**requests_data)
         #处理断言
+        #http断言
         if case["check"]:
             assert jsonpath.jsonpath(res.json(),case["check"])[0]==case["expected"]
         else:
             assert case["expected"] in res.text
 
+        #数据库断言
+        if case["sql_check"] and case["sql_expected"]:
+            conn=pymysql.Connect(
+                host="192.168.10.131",
+                port=3306,
+                database="mydb",
+                user="root",
+                password="123456",
+                charset="utf8"
+            )
+            cur=conn.cursor()
+            #执行语句
+            cur.execute(case["sql_check"])
+            result=cur.fetchone()
+            cur.close()
+            conn.close()
+            assert result[0]==case["sql_expected"]
         #提取
