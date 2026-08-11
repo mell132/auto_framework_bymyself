@@ -61,7 +61,27 @@ class TestRunner:
         #json提取
         if case["jsonExData"]:
             for key,value in eval(case["jsonExData"]).items():
-                value1=jsonpath.jsonpath(res.json(),value)[0]
-                all[key]=value1
-                print(all)
+                value=jsonpath.jsonpath(res.json(),value)[0]
+                all[key]=value
+                #print(all)
 
+        #数据库提取
+        if case["sqlExData"]:
+            for key,value in eval(case["sqlExData"]).items():
+                conn = pymysql.Connect(
+                    host="192.168.10.131",
+                    port=3306,
+                    database="mydb",
+                    user="root",
+                    password="123456",
+                    charset="utf8"
+                )
+                cur = conn.cursor()
+                # 执行语句
+                cur.execute(value)
+                result = cur.fetchone()
+                cur.close()
+                conn.close()
+                value=result[0]
+                all[key] = value
+                print(all)
