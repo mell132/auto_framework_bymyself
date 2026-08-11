@@ -2,6 +2,8 @@ import pytest
 import requests
 import jsonpath
 import pymysql
+from jinja2 import Template
+
 from utils.excel_utils import read_excel
 
 class TestRunner:
@@ -13,6 +15,9 @@ class TestRunner:
     @pytest.mark.parametrize("case",data)
     def test_case(self,case):
         all=self.all
+        #引用全局变量，根据all的值渲染case
+        case=eval(Template(str(case)).render(all))
+
         #解析请求数据
         method = case["method"]
         url = "http://192.168.10.131:8888/api/private/v1"+case["path"]
@@ -84,4 +89,4 @@ class TestRunner:
                 conn.close()
                 value=result[0]
                 all[key] = value
-                print(all)
+                #print(all)
