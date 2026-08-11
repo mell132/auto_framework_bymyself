@@ -2,7 +2,9 @@ import pytest
 import requests
 import jsonpath
 import pymysql
+import allure
 from jinja2 import Template
+from openpyxl.styles.builtins import title
 
 from utils.excel_utils import read_excel
 
@@ -17,7 +19,10 @@ class TestRunner:
         all=self.all
         #引用全局变量，根据all的值渲染case
         case=eval(Template(str(case)).render(all))
-
+        #初始化allure报告
+        allure.dynamic.feature(case["feature"])
+        allure.dynamic.story(case["story"])
+        allure.dynamic.title(f"ID:{case["id"]} --------{case["title"]}")
         #解析请求数据
         method = case["method"]
         url = "http://192.168.10.131:8888/api/private/v1"+case["path"]
