@@ -26,4 +26,5 @@ def analyse_case(case):
     }
 
     logging.info(f"1.解析请求数据，解析后的请求结果为：{requests_data}")
+    allure.attach(f"1.解析请求数据，解析后的请求结果为：{requests_data}")
     return requests_data
