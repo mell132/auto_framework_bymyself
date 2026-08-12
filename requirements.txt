@@ -1,0 +1,7 @@
+requests
+pymysql
+jsonpath
+pytest
+openpyxl
+allure-pytest
+jinja2
